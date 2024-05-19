@@ -1,11 +1,9 @@
-// src/solana/solana.service.ts
 import { Injectable } from '@nestjs/common';
 import { Connection, PublicKey, clusterApiUrl, Keypair, SystemProgram } from '@solana/web3.js';
 import { AnchorProvider, Program, Idl, BN } from '@project-serum/anchor';
 import { readFileSync } from 'fs';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
 import IDL from "./idl.json";
- // Ensure this path is correc
 
 @Injectable()
 export class SolanaService {
