@@ -10,6 +10,7 @@ import {
   Param,
   Query,
 } from "@nestjs/common";
+import { Request } from 'express'; // Import Request from express
 import { UsersService } from "./users.service";
 import { SignUpDto } from "./dto/signup.dto";
 import * as Joi from "joi";
