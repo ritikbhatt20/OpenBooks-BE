@@ -1,9 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { Connection, PublicKey, clusterApiUrl, Keypair, SystemProgram } from '@solana/web3.js';
 import { AnchorProvider, Program, Idl, BN } from '@project-serum/anchor';
+import { Wallet } from '@project-serum/anchor';
 import { readFileSync } from 'fs';
 import { TOKEN_PROGRAM_ID } from '@solana/spl-token';
-import IDL from "./idl.json";
+import IDL from './idl.json'
 
 @Injectable()
 export class SolanaService {
@@ -14,9 +15,9 @@ export class SolanaService {
   constructor() {
     this.connection = new Connection(clusterApiUrl('devnet'), 'confirmed');
 
-    const wallet = Keypair.fromSecretKey(
-      new Uint8Array(JSON.parse(readFileSync('path/to/your/wallet/keypair.json', 'utf-8')))
-    );
+    const wallet = new Wallet(Keypair.fromSecretKey(
+        new Uint8Array(JSON.parse(readFileSync('path/to/your/wallet/keypair.json', 'utf-8')))
+    ));
 
     this.provider = new AnchorProvider(this.connection, wallet, AnchorProvider.defaultOptions());
     this.program = new Program(IDL as Idl, new PublicKey('8yvPtTFYnTzw5GGBaJ6UgFrURzYg1CeFtKgiuA33cAG2'), this.provider);
