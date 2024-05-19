@@ -1,73 +1,94 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
+# OpenBooks Smart Contract Integration with Nest.js Backend
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+This README provides an overview of integrating the OpenBooks Escrow Smart Contract with a Nest.js backend. The integration facilitates book rentals with customizable pricing and durations.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## Setup
 
-## Description
+1. **Installation**:
+   - Install Node.js and npm if not already installed.
+   - Clone the OpenBooks repository and navigate to the Nest.js backend directory.
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+2. **Configuration**:
+   - Configure the Solana wallet keypair and ensure it's accessible to the backend.
+   - Update the Solana network endpoint in `solana.service.ts` to the desired network (e.g., devnet).
 
-## Installation
+3. **Dependencies**:
+   - Install project dependencies using `npm install`.
 
-```bash
-$ npm install
-```
+## Smart Contract APIs Integration
 
-## Running the app
+The integration involves implementing Nest.js controller and service to interact with the smart contract APIs.
 
-```bash
-# development
-$ npm run start
+### Controller
 
-# watch mode
-$ npm run start:dev
+- **solana.controller.ts**:
+  - Provides API endpoints for initializing escrow, requesting rent, accepting rent, and returning books.
+  - Extracts request body parameters and passes them to corresponding service methods.
 
-# production mode
-$ npm run start:prod
-```
+### Service
 
-## Test
+- **solana.service.ts**:
+  - Initializes Solana connection, wallet, and program.
+  - Implements methods to invoke smart contract functions using the Anchor framework.
+  - Each method corresponds to a specific smart contract function:
+    - `initializeEscrow`: Initializes the escrow account.
+    - `requestRent`: Initiates a rental request.
+    - `acceptRent`: Accepts a rental request.
+    - `returnBook`: Processes the return of a rented book.
 
-```bash
-# unit tests
-$ npm run test
+## Usage
 
-# e2e tests
-$ npm run test:e2e
+1. **Start the Backend**:
+   - Run the Nest.js backend using `npm run start`.
 
-# test coverage
-$ npm run test:cov
-```
+2. **API Endpoints**:
+   - Access the API endpoints defined in `solana.controller.ts` at `/solana/*`.
 
-## Support
+3. **Interact with Smart Contract**:
+   - Use API requests to interact with the OpenBooks Escrow Smart Contract.
+   - Ensure proper request body parameters are provided for each API endpoint.
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+## Example Requests
 
-## Stay in touch
+### Initialize Escrow
+```http
+POST /solana/initialize-escrow
+Content-Type: application/json
 
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+{
+  "pricePerDay": 10,
+  "depositAmount": 50,
+  "initializerDepositTokenAccount": "publicKey1",
+  "initializerReceiveWalletAccount": "publicKey2"
+}
+POST /solana/request-rent
+Content-Type: application/json
 
-## License
+{
+  "rentalDays": 7,
+  "taker": "publicKey1",
+  "escrowAccount": "publicKey2"
+}
 
-Nest is [MIT licensed](LICENSE).
+POST /solana/accept-rent
+Content-Type: application/json
+
+{
+  "taker": "publicKey1",
+  "takerDepositTokenAccount": "publicKey2",
+  "initializerDepositTokenAccount": "publicKey3",
+  "pdaAccount": "publicKey4",
+  "escrowAccount": "publicKey5"
+}
+
+POST /solana/return-book
+Content-Type: application/json
+
+{
+  "taker": "publicKey1",
+  "initializerReceiveWalletAccount": "publicKey2",
+  "takerDepositTokenAccount": "publicKey3",
+  "initializerDepositTokenAccount": "publicKey4",
+  "pdaAccount": "publicKey5",
+  "escrowAccount": "publicKey6"
+}
